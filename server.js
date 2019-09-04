@@ -1,10 +1,10 @@
 const express = require('express');
 
-const Router = require('./api/router.js');
+const UsersRouter = require('./api/usersRouter.js');
 
 const server = express();
 
 server.use(express.json());
-server.use('/api/', Router);
+server.use('/api/', UsersRouter);
 
 module.exports = server;
