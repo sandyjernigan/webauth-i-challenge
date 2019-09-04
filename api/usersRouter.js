@@ -29,13 +29,34 @@ server.post('/api/register', (req, res) => {
 
 //#endregion
 
-//#region 
+//#region Login
 
 // POST 	/api/login 	
   // Use the credentials sent inside the body to authenticate the user. 
   // On successful login, create a new session for the user and send back a 
   // 'Logged in' message and a cookie that contains the user id. If login fails, 
   // respond with the correct status code and the message: 'You shall not pass!'
+
+server.post('/api/login', (req, res) => {
+  let { username, password } = req.body;
+
+  Users.findBy({ username })
+    .first()
+    .then(user => {
+      if (user && bcrypt.compareSync(password, user.password)) {
+        res.status(200).json({ message: `Welcome ${user.username}! You are Logged in.` });
+        // TODO: Add Cookie that contains the user id
+
+      } else {
+        res.status(401).json({ message: 'You shall not pass!' });
+      }
+    })
+    .catch(error => {
+      res.status(500).json(error);
+    });
+});
+
+//#endregion
 
 // GET 	/api/users 	
   // If the user is logged in, respond with an array of all the users contained 
