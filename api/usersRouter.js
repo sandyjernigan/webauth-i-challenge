@@ -58,14 +58,28 @@ server.post('/api/login', (req, res) => {
 
 //#endregion
 
+//#region - Custom
+
 // GET 	/api/users 	
   // If the user is logged in, respond with an array of all the users contained 
   // in the database. If the user is not logged in repond with the correct status 
   // code and the message: 'You shall not pass!'.
 
+server.get('/api/users', isLoggedIn, (req, res) => {
+  Users.find()
+    .then(users => {
+      res.json(users);
+    })
+    .catch(err => res.send(err));
+});
+
 //#endregion
 
 //#region - Custom Middleware
+function isLoggedIn(req, res, next) {
+  // TODO: Check for cookie with login data, if exists go to next()
+  next();
+}
 //#endregion
 
 module.exports = router;
