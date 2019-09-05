@@ -73,7 +73,7 @@ router.post('/login', (req, res) => {
 //#endregion
 
 //#region Logout
-router.get('/api/logout', (req, res) => {
+router.get('/logout', (req, res) => {
   if (req.session) {
     req.session.destroy(err => {
       if (err) {
@@ -86,8 +86,7 @@ router.get('/api/logout', (req, res) => {
 });
 //#endregion
 
-
-//#region - Custom
+//#region - Test Auth - Get all Users
 
 // GET 	/api/users 	
   // If the user is logged in, respond with an array of all the users contained 
