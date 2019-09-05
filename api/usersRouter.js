@@ -1,11 +1,22 @@
-const express = require('express');
-const helmet = require('helmet');
-const cors = require('cors');
+const router = require('express').Router();
 const bcrypt = require('bcryptjs');
 
-const usersModel = require('./usersModel.js');
+const Users = require('./usersModel.js');
 
-const router = express.Router();
+const session = require('express-session');
+router.use(
+  session({
+    name: 'notsession', // default is connect.sid
+    secret: 'nobody tosses a dwarf!',
+    cookie: {
+      maxAge: 1 * 24 * 60 * 60 * 1000,
+      secure: false, // only set cookies over https. Server will not send back a cookie over http.
+    }, // 1 day in milliseconds
+    httpOnly: true, // don't let JS code access cookies. Browser extensions run JS code on your browser!
+    resave: false,
+    saveUninitialized: false,
+  })
+);
 
 //#region Register
 
@@ -16,7 +27,8 @@ const router = express.Router();
 router.post('/register', (req, res) => {
   let user = req.body;
 
-  bcrypt.hashSync(user.password, 12);
+  const hash = bcrypt.hashSync(user.password, 14);
+  user.password = hash;
 
   Users.add(user)
     .then(saved => {
@@ -45,9 +57,10 @@ router.post('/login', (req, res) => {
     .then(user => {
       if (user && bcrypt.compareSync(password, user.password)) {
         // Add Cookie that contains the user name
-        req.session.user = user;
+        console.log("Login")
+        console.log(req.session)
+        req.session.user = username;
         res.status(200).json({ message: `Welcome ${user.username}! You are Logged in.` });
-
       } else {
         res.status(401).json({ message: 'You shall not pass!' });
       }
@@ -58,6 +71,21 @@ router.post('/login', (req, res) => {
 });
 
 //#endregion
+
+//#region Logout
+router.get('/api/logout', (req, res) => {
+  if (req.session) {
+    req.session.destroy(err => {
+      if (err) {
+        res.send('error logging out');
+      } else {
+        res.send('good bye');
+      }
+    });
+  }
+});
+//#endregion
+
 
 //#region - Custom
 

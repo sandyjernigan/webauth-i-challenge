@@ -12,12 +12,12 @@ const sessionConfig = {
   name: "hellothere",
   secret: 'keep it secret, keep it safe',
   cookie: {
-    maxAge: 1 * 24 * 60 * 60 * 1000,
+    maxAge: 1 * 24 * 60 * 60 * 1000, // days * hours * minutes * seconds * milliseconds
     secure: false, // true, (in production set to true) // only set cookies over https. Server will not send back a cookie over http.
     httpOnly: true,
   }, // 1 day in milliseconds // don't let JS code access cookies. Browser extensions run JS code on your browser!
   resave: false,
-  saveUninitialized: false, // GDPR laws against setting cookies automatically
+  saveUninitialized: true, // GDPR laws against setting cookies automatically
 }
 
 server.use(helmet());
@@ -41,6 +41,7 @@ server.use(session(sessionConfig));
 // );
 
 server.get('/', (req, res) => {
+  //req.session.name = 'Frodo';
   res.send("Hello World!");
 });
 
