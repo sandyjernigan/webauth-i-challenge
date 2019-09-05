@@ -44,9 +44,9 @@ server.post('/login', (req, res) => {
     .first()
     .then(user => {
       if (user && bcrypt.compareSync(password, user.password)) {
+        // Add Cookie that contains the user name
         req.session.user = user;
         res.status(200).json({ message: `Welcome ${user.username}! You are Logged in.` });
-        // TODO: Add Cookie that contains the user id
 
       } else {
         res.status(401).json({ message: 'You shall not pass!' });
@@ -78,8 +78,12 @@ server.get('/users', isLoggedIn, (req, res) => {
 
 //#region - Custom Middleware
 function isLoggedIn(req, res, next) {
-  // TODO: Check for cookie with login data, if exists go to next()
-  next();
+  // Check for cookie with login data, if exists go to next()
+  if (req.session && req.session.user) {
+    next();
+  } else {
+    res.status(401).json({ message: 'You shall not pass!' });
+  }
 }
 //#endregion
 
