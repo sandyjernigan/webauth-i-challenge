@@ -1,7 +1,7 @@
 const express = require('express');
 const helmet = require('helmet');
 const cors = require('cors');
-const bcrypt = require('bcryptjs')
+const bcrypt = require('bcryptjs');
 
 const usersModel = require('./usersModel.js');
 
@@ -44,6 +44,7 @@ server.post('/api/login', (req, res) => {
     .first()
     .then(user => {
       if (user && bcrypt.compareSync(password, user.password)) {
+        req.session.user = user;
         res.status(200).json({ message: `Welcome ${user.username}! You are Logged in.` });
         // TODO: Add Cookie that contains the user id
 
