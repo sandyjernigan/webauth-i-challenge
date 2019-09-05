@@ -13,7 +13,7 @@ const router = express.Router();
   // Creates a user using the information sent inside the body of the request. 
   // Hash the password before saving the user to the database.
 
-server.post('/register', (req, res) => {
+router.post('/register', (req, res) => {
   let user = req.body;
 
   bcrypt.hashSync(user.password, 12);
@@ -37,7 +37,7 @@ server.post('/register', (req, res) => {
   // 'Logged in' message and a cookie that contains the user id. If login fails, 
   // respond with the correct status code and the message: 'You shall not pass!'
 
-server.post('/login', (req, res) => {
+router.post('/login', (req, res) => {
   let { username, password } = req.body;
 
   Users.findBy({ username })
@@ -66,7 +66,7 @@ server.post('/login', (req, res) => {
   // in the database. If the user is not logged in repond with the correct status 
   // code and the message: 'You shall not pass!'.
 
-server.get('/users', isLoggedIn, (req, res) => {
+router.get('/users', isLoggedIn, (req, res) => {
   Users.find()
     .then(users => {
       res.json(users);
