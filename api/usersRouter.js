@@ -2,6 +2,7 @@ const router = require('express').Router();
 const bcrypt = require('bcryptjs');
 
 const Users = require('./usersModel.js');
+const restricted = require('./restricted-middleware.js');
 
 //#region Register
 
@@ -41,10 +42,10 @@ router.post('/login', (req, res) => {
     .first()
     .then(user => {
       if (user && bcrypt.compareSync(password, user.password)) {
+
         // Add Cookie that contains the user name
-        console.log("Login")
-        console.log(req.session)
         req.session.user = username;
+        
         res.status(200).json({ message: `Welcome ${user.username}! You are Logged in.` });
       } else {
         res.status(401).json({ message: 'You shall not pass!' });
@@ -78,7 +79,7 @@ router.get('/logout', (req, res) => {
   // in the database. If the user is not logged in repond with the correct status 
   // code and the message: 'You shall not pass!'.
 
-router.get('/users', isLoggedIn, (req, res) => {
+router.get('/users', restricted, (req, res) => {
   Users.find()
     .then(users => {
       res.json(users);
@@ -86,17 +87,6 @@ router.get('/users', isLoggedIn, (req, res) => {
     .catch(err => res.send(err));
 });
 
-//#endregion
-
-//#region - Custom Middleware
-function isLoggedIn(req, res, next) {
-  // Check for cookie with login data, if exists go to next()
-  if (req.session && req.session.user) {
-    next();
-  } else {
-    res.status(401).json({ message: 'You shall not pass!' });
-  }
-}
 //#endregion
 
 module.exports = router;

@@ -1,0 +1,12 @@
+const bcrypt = require('bcryptjs');
+
+const Users = require('./usersModel.js');
+
+module.exports = (req, res, next) => {
+  // Check for cookie with login data, if exists go to next()
+  if (req.session && req.session.user) {
+    next();
+  } else {
+    res.status(401).json({ message: 'You shall not pass!' });
+  }
+};
