@@ -3,13 +3,15 @@ const helmet = require('helmet');
 const cors = require('cors');
 const session = require('express-session');
 const connectSessionKnex = require('connect-session-knex');
-
-const UsersRouter = require('./api/usersRouter.js');
-const db = require('./data/dbConfig.js');
-
-const KnexSessionStore = connectSessionKnex(session)
-
 const server = express();
+
+// Router requires
+const UsersRouter = require('./api/usersRouter.js');
+const RestrictedRouter = require('./api/restricted.js');
+
+// Database
+const db = require('./data/dbConfig.js');
+const KnexSessionStore = connectSessionKnex(session)
 
 // configure express-session middleware
 const sessionConfig = {
@@ -36,11 +38,24 @@ server.use(helmet());
 server.use(express.json());
 server.use(cors());
 server.use(session(sessionConfig));
-server.use('/api/', UsersRouter);
 
+// Routers
+server.use('/api/', UsersRouter);
+server.use('/api/restricted/', RestrictedRouter);
+
+// Base Route
 server.get('/', (req, res) => {
-  //req.session.name = 'Frodo';
-  res.send("Hello World!");
+  res.send("<div align=\'center\'>" + 
+    "<p>Hello World!</p>" + 
+    "<p>React App should have a login app.</p>" +
+    "<p>If redirected to this page, cookie is not set and user needs to login.</p>" +
+    "</div>");
 });
+
+const sendUserError = (msg, res) => {
+  res.status(422);
+  res.json({ Error: msg });
+  return;
+};
 
 module.exports = server;
